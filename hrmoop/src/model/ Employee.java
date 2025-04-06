@@ -4,7 +4,6 @@ import java.util.Date;
 
 public class Employee {
     private int userId;
-    private String username;  // Cần khai báo biến username, thay cho email
     private String email;
     private String firstName;
     private String lastName;
@@ -13,16 +12,14 @@ public class Employee {
     private String phoneNumber;
     private String address;
     private Date hireDate;
-    private double salary;  // Thêm thuộc tính salary
     private String status;
     private boolean access_permissions;  // Sửa lại thành kiểu dữ liệu boolean
 
     // Constructor đầy đủ
-    public Employee(int userId, String username, String email, String firstName, String lastName,
-                    Date dateOfBirth, String gender, String phoneNumber, String address, Date hireDate, 
-                    double salary, String status, boolean access_permissions) {
+    public Employee(int userId, String email, String firstName, String lastName,
+                    Date dateOfBirth, String gender, String phoneNumber, String address, Date hireDate, String status, boolean access_permissions) 
+    {
         this.userId = userId;
-        this.username = username;  // Sửa lại tên tham số
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -31,7 +28,6 @@ public class Employee {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.hireDate = hireDate;
-        this.salary = salary;
         this.status = status;
         this.access_permissions = access_permissions;
     }
@@ -47,14 +43,6 @@ public class Employee {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {
@@ -125,13 +113,6 @@ public class Employee {
         this.hireDate = hireDate;
     }
 
-    public double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
 
     public String getStatus() {
         return status;
