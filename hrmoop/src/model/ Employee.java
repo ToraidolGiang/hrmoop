@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Employee {
     private int userId;
-    private String username;
+    private String username;  // Cần khai báo biến username, thay cho email
     private String email;
     private String firstName;
     private String lastName;
@@ -12,21 +12,17 @@ public class Employee {
     private String gender;
     private String phoneNumber;
     private String address;
-    private int positionId;
-    private String positionName;
-    private int departmentId;
-    private String departmentName;
-    private Integer managerId;
-    private String managerName;
     private Date hireDate;
-    private double salary;
+    private double salary;  // Thêm thuộc tính salary
     private String status;
+    private boolean access_permissions;  // Sửa lại thành kiểu dữ liệu boolean
 
     // Constructor đầy đủ
     public Employee(int userId, String username, String email, String firstName, String lastName,
-                    Date dateOfBirth, String gender, String phoneNumber, String address, Date hireDate, double salary, String status) {
+                    Date dateOfBirth, String gender, String phoneNumber, String address, Date hireDate, 
+                    double salary, String status, boolean access_permissions) {
         this.userId = userId;
-        this.username = username;
+        this.username = username;  // Sửa lại tên tham số
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,6 +33,7 @@ public class Employee {
         this.hireDate = hireDate;
         this.salary = salary;
         this.status = status;
+        this.access_permissions = access_permissions;
     }
 
     // Constructor rỗng
@@ -120,54 +117,6 @@ public class Employee {
         this.address = address;
     }
 
-    public int getPositionId() {
-        return positionId;
-    }
-
-    public void setPositionId(int positionId) {
-        this.positionId = positionId;
-    }
-    
-    public String getPositionName() {
-        return positionName;
-    }
-
-    public void setPositionName(String positionName) {
-        this.positionName = positionName;
-    }
-    
-    public int getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(int departmentId) {
-        this.departmentId = departmentId;
-    }
-    
-    public String getDepartmentName() {
-        return departmentName;
-    }
-
-    public void setDepartmentName(String departmentName) {
-        this.departmentName = departmentName;
-    }
-    
-    public Integer getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(Integer managerId) {
-        this.managerId = managerId;
-    }
-    
-    public String getManagerName() {
-        return managerName;
-    }
-
-    public void setManagerName(String managerName) {
-        this.managerName = managerName;
-    }
-
     public Date getHireDate() {
         return hireDate;
     }
@@ -190,6 +139,14 @@ public class Employee {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isAccessPermissions() {
+        return access_permissions;
+    }
+
+    public void setAccessPermissions(boolean access_permissions) {
+        this.access_permissions = access_permissions;
     }
 
     @Override
