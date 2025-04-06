@@ -13,13 +13,8 @@ public class EmployeeDAO {
 
     public List<Employee> getAllEmployees() {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT u.*, d.department_name, p.position_name, " +
-                    "m.first_name as manager_first_name, m.last_name as manager_last_name " +
+        String sql = "SELECT u.* " +
                     "FROM users u " +
-                    "LEFT JOIN departments d ON u.department_id = d.department_id " +
-                    "LEFT JOIN positions p ON u.position_id = p.position_id " +
-                    "LEFT JOIN users m ON u.manager_id = m.user_id " +
-                    "WHERE u.role = 'EMPLOYEE' " +
                     "ORDER BY u.last_name, u.first_name";
 
         try (Connection conn = getConnection();
@@ -38,13 +33,9 @@ public class EmployeeDAO {
     }
 
     public Employee getEmployeeById(int userId) {
-        String sql = "SELECT u.*, d.department_name, p.position_name, " +
-                    "m.first_name as manager_first_name, m.last_name as manager_last_name " +
+        String sql = "SELECT u.* " +
                     "FROM users u " +
-                    "LEFT JOIN departments d ON u.department_id = d.department_id " +
-                    "LEFT JOIN positions p ON u.position_id = p.position_id " +
-                    "LEFT JOIN users m ON u.manager_id = m.user_id " +
-                    "WHERE u.user_id = ? AND u.role = 'EMPLOYEE'";
+                    "WHERE u.user_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -63,42 +54,32 @@ public class EmployeeDAO {
         return null;
     }
 
-    public boolean addEmployee(Employee employee, String password) {
-        String sql = "INSERT INTO users (username, password, email, first_name, last_name, " +
-                    "date_of_birth, gender, phone_number, address, role, department_id, " +
-                    "position_id, manager_id, hire_date, salary, status) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'EMPLOYEE', ?, ?, ?, ?, ?, ?)";
+    public boolean addEmployee(Employee employee) {
+        String sql = "INSERT INTO users (email, first_name, last_name, " +
+                    "date_of_birth, gender, phone_number, address, " +
+                    "hire_date, status,access_permissions) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
-            stmt.setString(1, employee.getUsername());
-            stmt.setString(2, password); // Trong thực tế, mật khẩu nên được mã hóa trước khi lưu
-            stmt.setString(3, employee.getEmail());
-            stmt.setString(4, employee.getFirstName());
-            stmt.setString(5, employee.getLastName());
+           
+            stmt.setString(1, employee.getEmail());
+            stmt.setString(2, employee.getFirstName());
+            stmt.setString(3, employee.getLastName());
             
             if (employee.getDateOfBirth() != null) {
-                stmt.setDate(6, new java.sql.Date(employee.getDateOfBirth().getTime()));
+                stmt.setDate(4, new java.sql.Date(employee.getDateOfBirth().getTime()));
             } else {
-                stmt.setNull(6, Types.DATE);
+                stmt.setNull(5, Types.DATE);
             }
             
-            stmt.setString(7, employee.getGender());
-            stmt.setString(8, employee.getPhoneNumber());
-            stmt.setString(9, employee.getAddress());
-            stmt.setInt(10, employee.getDepartmentId());
-            stmt.setInt(11, employee.getPositionId());
-            
-            if (employee.getManagerId() != null) {
-                stmt.setInt(12, employee.getManagerId());
-            } else {
-                stmt.setNull(12, Types.INTEGER);
-            }
-            
-            stmt.setDate(13, new java.sql.Date(employee.getHireDate().getTime()));
-            stmt.setDouble(14, employee.getSalary());
-            stmt.setString(15, employee.getStatus());
+            stmt.setString(6, employee.getGender());
+            stmt.setString(7, employee.getPhoneNumber());
+            stmt.setString(8, employee.getAddress());
+            stmt.setDate(9, new java.sql.Date(employee.getHireDate().getTime()));
+            stmt.setString(10, employee.getStatus());
+            stmt.setString(11, employee.access_permissions());// code hamf getPermission
             
             int affectedRows = stmt.executeUpdate();
             
@@ -120,37 +101,28 @@ public class EmployeeDAO {
     public boolean updateEmployee(Employee employee) {
         String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, " +
                     "date_of_birth = ?, gender = ?, phone_number = ?, address = ?, " +
-                    "department_id = ?, position_id = ?, manager_id = ?, salary = ?, status = ? " +
-                    "WHERE user_id = ? AND role = 'EMPLOYEE'";
+                    "status = ? " +
+                    "WHERE user_id = ? ";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, employee.getEmail());
+           stmt.setString(1, employee.getEmail());
             stmt.setString(2, employee.getFirstName());
             stmt.setString(3, employee.getLastName());
             
             if (employee.getDateOfBirth() != null) {
                 stmt.setDate(4, new java.sql.Date(employee.getDateOfBirth().getTime()));
             } else {
-                stmt.setNull(4, Types.DATE);
+                stmt.setNull(5, Types.DATE);
             }
             
-            stmt.setString(5, employee.getGender());
-            stmt.setString(6, employee.getPhoneNumber());
-            stmt.setString(7, employee.getAddress());
-            stmt.setInt(8, employee.getDepartmentId());
-            stmt.setInt(9, employee.getPositionId());
-            
-            if (employee.getManagerId() != null) {
-                stmt.setInt(10, employee.getManagerId());
-            } else {
-                stmt.setNull(10, Types.INTEGER);
-            }
-            
-            stmt.setDouble(11, employee.getSalary());
-            stmt.setString(12, employee.getStatus());
-            stmt.setInt(13, employee.getUserId());
+            stmt.setString(6, employee.getGender());
+            stmt.setString(7, employee.getPhoneNumber());
+            stmt.setString(8, employee.getAddress());
+            stmt.setDate(9, new java.sql.Date(employee.getHireDate().getTime()));
+            stmt.setString(10, employee.getStatus());
+            stmt.setString(11, employee.access_permissions());// code hamf getPermission
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -160,7 +132,7 @@ public class EmployeeDAO {
     }
 
     public boolean deleteEmployee(int userId) {
-        String sql = "UPDATE users SET status = 'INACTIVE' WHERE user_id = ? AND role = 'EMPLOYEE'";
+        String sql = "UPDATE users SET status = 'INACTIVE' WHERE user_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -176,7 +148,6 @@ public class EmployeeDAO {
     private Employee extractEmployeeFromResultSet(ResultSet rs) throws SQLException {
         Employee employee = new Employee();
         employee.setUserId(rs.getInt("user_id"));
-        employee.setUsername(rs.getString("username"));
         employee.setEmail(rs.getString("email"));
         employee.setFirstName(rs.getString("first_name"));
         employee.setLastName(rs.getString("last_name"));
@@ -184,23 +155,9 @@ public class EmployeeDAO {
         employee.setGender(rs.getString("gender"));
         employee.setPhoneNumber(rs.getString("phone_number"));
         employee.setAddress(rs.getString("address"));
-        employee.setDepartmentId(rs.getInt("department_id"));
-        employee.setDepartmentName(rs.getString("department_name"));
-        employee.setPositionId(rs.getInt("position_id"));
-        employee.setPositionName(rs.getString("position_name"));
-        
-        int managerId = rs.getInt("manager_id");
-        if (!rs.wasNull()) {
-            employee.setManagerId(managerId);
-            String managerFirstName = rs.getString("manager_first_name");
-            String managerLastName = rs.getString("manager_last_name");
-            employee.setManagerName((managerFirstName != null && managerLastName != null) ? 
-                                    managerFirstName + " " + managerLastName : "");
-        }
-        
         employee.setHireDate(rs.getDate("hire_date"));
-        employee.setSalary(rs.getDouble("salary"));
         employee.setStatus(rs.getString("status"));
+        employee.setAccessPermissions(rs.getString("access_permissions"));
         return employee;
     }
 }
