@@ -1,8 +1,7 @@
-package com.hrm.model.dao;
+package EmployeeDAO;
 
-import com.hrm.model.db.DatabaseConnection;
-import com.hrm.model.entity.Employee;
-
+import databaseconnection.*;
+import Employee.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,12 @@ public class EmployeeDAO {
 
     public List<Employee> getAllEmployees() {
         List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT u.*,
+        String sql = "SELECT u.*, d.department_name, p.position_name, " +
+                    "m.first_name as manager_first_name, m.last_name as manager_last_name " +
+                    "FROM users u " +
+                    "LEFT JOIN departments d ON u.department_id = d.department_id " +
+                    "LEFT JOIN positions p ON u.position_id = p.position_id " +
+                    "LEFT JOIN users m ON u.manager_id = m.user_id " +
                     "WHERE u.role = 'EMPLOYEE' " +
                     "ORDER BY u.last_name, u.first_name";
 
@@ -34,7 +38,12 @@ public class EmployeeDAO {
     }
 
     public Employee getEmployeeById(int userId) {
-        String sql = "SELECT u.*, 
+        String sql = "SELECT u.*, d.department_name, p.position_name, " +
+                    "m.first_name as manager_first_name, m.last_name as manager_last_name " +
+                    "FROM users u " +
+                    "LEFT JOIN departments d ON u.department_id = d.department_id " +
+                    "LEFT JOIN positions p ON u.position_id = p.position_id " +
+                    "LEFT JOIN users m ON u.manager_id = m.user_id " +
                     "WHERE u.user_id = ? AND u.role = 'EMPLOYEE'";
 
         try (Connection conn = getConnection();
@@ -56,7 +65,8 @@ public class EmployeeDAO {
 
     public boolean addEmployee(Employee employee, String password) {
         String sql = "INSERT INTO users (username, password, email, first_name, last_name, " +
-                    "date_of_birth, gender, phone_number, address, role, hire_date, salary, status) " +
+                    "date_of_birth, gender, phone_number, address, role, department_id, " +
+                    "position_id, manager_id, hire_date, salary, status) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'EMPLOYEE', ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
@@ -77,6 +87,8 @@ public class EmployeeDAO {
             stmt.setString(7, employee.getGender());
             stmt.setString(8, employee.getPhoneNumber());
             stmt.setString(9, employee.getAddress());
+            stmt.setInt(10, employee.getDepartmentId());
+            stmt.setInt(11, employee.getPositionId());
             
             if (employee.getManagerId() != null) {
                 stmt.setInt(12, employee.getManagerId());
@@ -108,7 +120,7 @@ public class EmployeeDAO {
     public boolean updateEmployee(Employee employee) {
         String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, " +
                     "date_of_birth = ?, gender = ?, phone_number = ?, address = ?, " +
-                    salary = ?, status = ? " +
+                    "department_id = ?, position_id = ?, manager_id = ?, salary = ?, status = ? " +
                     "WHERE user_id = ? AND role = 'EMPLOYEE'";
 
         try (Connection conn = getConnection();
@@ -127,7 +139,8 @@ public class EmployeeDAO {
             stmt.setString(5, employee.getGender());
             stmt.setString(6, employee.getPhoneNumber());
             stmt.setString(7, employee.getAddress());
-            
+            stmt.setInt(8, employee.getDepartmentId());
+            stmt.setInt(9, employee.getPositionId());
             
             if (employee.getManagerId() != null) {
                 stmt.setInt(10, employee.getManagerId());
@@ -171,6 +184,19 @@ public class EmployeeDAO {
         employee.setGender(rs.getString("gender"));
         employee.setPhoneNumber(rs.getString("phone_number"));
         employee.setAddress(rs.getString("address"));
+        employee.setDepartmentId(rs.getInt("department_id"));
+        employee.setDepartmentName(rs.getString("department_name"));
+        employee.setPositionId(rs.getInt("position_id"));
+        employee.setPositionName(rs.getString("position_name"));
+        
+        int managerId = rs.getInt("manager_id");
+        if (!rs.wasNull()) {
+            employee.setManagerId(managerId);
+            String managerFirstName = rs.getString("manager_first_name");
+            String managerLastName = rs.getString("manager_last_name");
+            employee.setManagerName((managerFirstName != null && managerLastName != null) ? 
+                                    managerFirstName + " " + managerLastName : "");
+        }
         
         employee.setHireDate(rs.getDate("hire_date"));
         employee.setSalary(rs.getDouble("salary"));
