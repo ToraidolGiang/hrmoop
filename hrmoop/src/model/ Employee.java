@@ -1,4 +1,4 @@
-package com.hrm.model;
+package Employee;
 
 import java.util.Date;
 
@@ -13,6 +13,11 @@ public class Employee {
     private String phoneNumber;
     private String address;
     private int positionId;
+    private String positionName;
+    private int departmentId;
+    private String departmentName;
+    private Integer managerId;
+    private String managerName;
     private Date hireDate;
     private double salary;
     private String status;
@@ -115,6 +120,54 @@ public class Employee {
         this.address = address;
     }
 
+    public int getPositionId() {
+        return positionId;
+    }
+
+    public void setPositionId(int positionId) {
+        this.positionId = positionId;
+    }
+    
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+    
+    public int getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
+    }
+    
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+    
+    public Integer getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(Integer managerId) {
+        this.managerId = managerId;
+    }
+    
+    public String getManagerName() {
+        return managerName;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
     public Date getHireDate() {
         return hireDate;
     }
@@ -144,7 +197,7 @@ public class Employee {
         return "Employee{" +
                 "userId=" + userId +
                 ", fullName='" + getFullName() + '\'' +
-                ", email='" + email + '\''+
+                ", email='" + email + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }
