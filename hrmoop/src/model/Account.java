@@ -9,8 +9,7 @@ public class Account {
     private int userId;
     private String username;
     private String password;
-    private String role;
-    private String status;
+    private String access_permissions;
     private Date createdDate;
     private Date lastLogin;
     
@@ -20,24 +19,12 @@ public class Account {
     public Account() {
     }
 
-    /**
-     * Parameterized constructor
-     * 
-     * @param userId      Unique identifier for the account
-     * @param username    Username for login
-     * @param password    Password for login
-     * @param role        Role of the account (e.g., "admin", "manager", "employee")
-     * @param status      Account status (e.g., "active", "inactive", "locked")
-     * @param createdDate Date when the account was created
-     * @param lastLogin   Date of last login
-     */
-    public Account(int userId, String username, String password, String role, 
-                  String status, Date createdDate, Date lastLogin) {
+    public Account(int userId, String username, String password, String access_permissions, 
+                   Date createdDate, Date lastLogin) {
         this.userId = userId;
         this.username = username;
         this.password = password;
-        this.role = role;
-        this.status = status;
+        this.access_permissions = access_permissions;
         this.createdDate = createdDate;
         this.lastLogin = lastLogin;
     }
@@ -67,20 +54,12 @@ public class Account {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public String getAccess_permissions() {
+        return access_permissions;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setAccess_permissions(String access_permissions) {
+        this.access_permissions = access_permissions;
     }
 
     public Date getCreatedDate() {
@@ -104,8 +83,7 @@ public class Account {
         return "Account{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
-                ", role='" + role + '\'' +
-                ", status='" + status + '\'' +
+                ", access_permissions='" + access_permissions + '\'' +
                 '}';
     }
 }
