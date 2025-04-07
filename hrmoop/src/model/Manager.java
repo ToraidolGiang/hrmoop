@@ -1,210 +1,131 @@
 package model;
+import java.util.Date;
 
-import model.DatabaseConnection.*;
-import model.Manager.*;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+public class Manager {
+    private int userId;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private Date dateOfBirth;
+    private String gender;
+    private String phoneNumber;
+    private String address;
+    private String status;
+    private String access_permissions;
 
-public class ManagerDAO {
-    private Connection getConnection() throws SQLException {
-        return DatabaseConnection.getInstance().getConnection();
+    // Constructor with all fields
+    public Manager(int userId, String email, String firstName, String lastName,
+                   Date dateOfBirth, String gender, String phoneNumber, String address,
+                   String status, String access_permissions) 
+    {
+        this.userId = userId;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.status = status;
+        this.access_permissions = access_permissions;
     }
 
-    public List<Manager> getAllManagers() {
-        List<Manager> managers = new ArrayList<>();
-        String sql = "SELECT m.* " +
-                    "FROM managers m " +
-                    "ORDER BY m.last_name, m.first_name";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                Manager manager = extractManagerFromResultSet(rs);
-                managers.add(manager);
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi lấy danh sách quản lý: " + e.getMessage());
-        }
-        
-        return managers;
+    // Default constructor
+    public Manager() {
     }
 
-    public Manager getManagerById(int userId) {
-        String sql = "SELECT m.* " +
-                    "FROM managers m " +
-                    "WHERE m.user_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, userId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return extractManagerFromResultSet(rs);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi lấy thông tin quản lý: " + e.getMessage());
-        }
-        
-        return null;
+    // Getters and Setters
+    public int getUserId() {
+        return userId;
     }
 
-    public boolean addManager(Manager manager) {
-        String sql = "INSERT INTO managers (email, first_name, last_name, " +
-                    "date_of_birth, gender, phone_number, address, " +
-                    "status, access_permissions) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
-            stmt.setString(1, manager.getEmail());
-            stmt.setString(2, manager.getFirstName());
-            stmt.setString(3, manager.getLastName());
-            
-            if (manager.getDateOfBirth() != null) {
-                stmt.setDate(4, new java.sql.Date(manager.getDateOfBirth().getTime()));
-            } else {
-                stmt.setNull(4, Types.DATE);
-            }
-            
-            stmt.setString(5, manager.getGender());
-            stmt.setString(6, manager.getPhoneNumber());
-            stmt.setString(7, manager.getAddress());
-            stmt.setString(8, manager.getStatus());
-            stmt.setString(9, manager.getAccessPermissions());
-            
-            int affectedRows = stmt.executeUpdate();
-            
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        manager.setUserId(generatedKeys.getInt(1));
-                        return true;
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi thêm quản lý mới: " + e.getMessage());
-        }
-        
-        return false;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public boolean updateManager(Manager manager) {
-        String sql = "UPDATE managers SET email = ?, first_name = ?, last_name = ?, " +
-                    "date_of_birth = ?, gender = ?, phone_number = ?, address = ?, " +
-                    "status = ?, access_permissions = ? " +
-                    "WHERE user_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, manager.getEmail());
-            stmt.setString(2, manager.getFirstName());
-            stmt.setString(3, manager.getLastName());
-            
-            if (manager.getDateOfBirth() != null) {
-                stmt.setDate(4, new java.sql.Date(manager.getDateOfBirth().getTime()));
-            } else {
-                stmt.setNull(4, Types.DATE);
-            }
-            
-            stmt.setString(5, manager.getGender());
-            stmt.setString(6, manager.getPhoneNumber());
-            stmt.setString(7, manager.getAddress());
-            stmt.setString(8, manager.getStatus());
-            stmt.setString(9, manager.getAccessPermissions());
-            stmt.setInt(10, manager.getUserId());
-            
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi cập nhật thông tin quản lý: " + e.getMessage());
-            return false;
-        }
+    public String getEmail() {
+        return email;
     }
 
-    public boolean deleteManager(int userId) {
-        String sql = "UPDATE managers SET status = 'INACTIVE' WHERE user_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, userId);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi xóa quản lý: " + e.getMessage());
-            return false;
-        }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    private Manager extractManagerFromResultSet(ResultSet rs) throws SQLException {
-        Manager manager = new Manager();
-        manager.setUserId(rs.getInt("user_id"));
-        manager.setEmail(rs.getString("email"));
-        manager.setFirstName(rs.getString("first_name"));
-        manager.setLastName(rs.getString("last_name"));
-        manager.setDateOfBirth(rs.getDate("date_of_birth"));
-        manager.setGender(rs.getString("gender"));
-        manager.setPhoneNumber(rs.getString("phone_number"));
-        manager.setAddress(rs.getString("address"));
-        manager.setStatus(rs.getString("status"));
-        manager.setAccessPermissions(rs.getString("access_permissions"));
-        return manager;
+    public String getFirstName() {
+        return firstName;
     }
-    
-    // Method to search managers by name
-    public List<Manager> searchManagersByName(String searchName) {
-        List<Manager> managers = new ArrayList<>();
-        String sql = "SELECT m.* FROM managers m " +
-                     "WHERE CONCAT(m.first_name, ' ', m.last_name) LIKE ? " +
-                     "ORDER BY m.last_name, m.first_name";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, "%" + searchName + "%");
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Manager manager = extractManagerFromResultSet(rs);
-                    managers.add(manager);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi tìm kiếm quản lý theo tên: " + e.getMessage());
-        }
-        
-        return managers;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
-    
-    // Method to filter managers by status
-    public List<Manager> getManagersByStatus(String status) {
-        List<Manager> managers = new ArrayList<>();
-        String sql = "SELECT m.* FROM managers m " +
-                     "WHERE m.status = ? " +
-                     "ORDER BY m.last_name, m.first_name";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, status);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Manager manager = extractManagerFromResultSet(rs);
-                    managers.add(manager);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi khi lọc quản lý theo trạng thái: " + e.getMessage());
-        }
-        
-        return managers;
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAccessPermissions() {
+        return access_permissions;
+    }
+
+    public void setAccessPermissions(String access_permissions) {
+        this.access_permissions = access_permissions;
+    }
+
+    @Override
+    public String toString() {
+        return "Manager{" +
+                "userId=" + userId +
+                ", fullName='" + getFullName() + '\'' +
+                ", email='" + email + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }
