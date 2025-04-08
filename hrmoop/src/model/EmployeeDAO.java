@@ -1,7 +1,17 @@
-package EmployeeDAO;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package EmployeeDao;
+
+/**
+ *
+ * @author Admin
+ */
 
 import databaseconnection.*;
 import Employee.*;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,15 +81,15 @@ public class EmployeeDAO {
             if (employee.getDateOfBirth() != null) {
                 stmt.setDate(4, new java.sql.Date(employee.getDateOfBirth().getTime()));
             } else {
-                stmt.setNull(5, Types.DATE);
+                stmt.setNull(4, Types.DATE);
             }
             
-            stmt.setString(6, employee.getGender());
-            stmt.setString(7, employee.getPhoneNumber());
-            stmt.setString(8, employee.getAddress());
-            stmt.setDate(9, new java.sql.Date(employee.getHireDate().getTime()));
-            stmt.setString(10, employee.getStatus());
-            stmt.setString(11, employee.access_permissions());// code hamf getPermission
+            stmt.setString(5, employee.getGender());
+            stmt.setString(6, employee.getPhoneNumber());
+            stmt.setString(7, employee.getAddress());
+            stmt.setDate(8, new java.sql.Date(employee.getHireDate().getTime()));
+            stmt.setString(9, employee.getStatus());
+            stmt.setBoolean(10, employee.isAccessPermissions());// code hamf getPermission
             
             int affectedRows = stmt.executeUpdate();
             
@@ -99,10 +109,10 @@ public class EmployeeDAO {
     }
 
     public boolean updateEmployee(Employee employee) {
-        String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, " +
-                    "date_of_birth = ?, gender = ?, phone_number = ?, address = ?, " +
-                    "status = ? " +
-                    "WHERE user_id = ? ";
+            String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, " +
+                                 "date_of_birth = ?, gender = ?, phone_number = ?, address = ?, " +
+                                 "hire_date = ?, status = ?, access_permissions = ? " +
+                                 "WHERE user_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -114,15 +124,16 @@ public class EmployeeDAO {
             if (employee.getDateOfBirth() != null) {
                 stmt.setDate(4, new java.sql.Date(employee.getDateOfBirth().getTime()));
             } else {
-                stmt.setNull(5, Types.DATE);
+                stmt.setNull(4, Types.DATE);
             }
             
-            stmt.setString(6, employee.getGender());
-            stmt.setString(7, employee.getPhoneNumber());
-            stmt.setString(8, employee.getAddress());
-            stmt.setDate(9, new java.sql.Date(employee.getHireDate().getTime()));
-            stmt.setString(10, employee.getStatus());
-            stmt.setString(11, employee.access_permissions());// code hamf getPermission
+            stmt.setString(5, employee.getGender());
+            stmt.setString(6, employee.getPhoneNumber());
+            stmt.setString(7, employee.getAddress());
+            stmt.setDate(8, new java.sql.Date(employee.getHireDate().getTime()));
+            stmt.setString(9, employee.getStatus());
+            stmt.setBoolean(10, employee.isAccessPermissions());// code hamf getPermission
+            stmt.setInt(11, employee.getUserId());
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -157,7 +168,7 @@ public class EmployeeDAO {
         employee.setAddress(rs.getString("address"));
         employee.setHireDate(rs.getDate("hire_date"));
         employee.setStatus(rs.getString("status"));
-        employee.setAccessPermissions(rs.getString("access_permissions"));
+        employee.setAccessPermissions(rs.getBoolean("access_permissions"));
         return employee;
     }
 }
